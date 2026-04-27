@@ -3,10 +3,14 @@ import com.github.junrar.Archive;
 import com.github.junrar.exception.RarException;
 import com.github.junrar.rarfile.FileHeader;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.File;
 import core.absCore;
+
+import javax.imageio.ImageIO;
 
 public class cbrReader extends absCore {
     public cbrReader(String pth) {
@@ -20,7 +24,12 @@ public class cbrReader extends absCore {
             while ((header=archive.nextFileHeader())!=null){
                 if (!header.isDirectory()){
                     InputStream is=archive.getInputStream(header);
-
+                    BufferedImage img=null;
+                    try{
+                        img=ImageIO.read(is);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             }
         } catch (RarException e) {
