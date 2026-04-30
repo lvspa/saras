@@ -28,23 +28,16 @@ public class cbrReader extends absCore {
     @Override
     public void openFile(File pth) {
         try(Archive archive= new Archive(pth)) {
-            List<FileHeader> headers=archive.getFileHeaders();
-            headers.sort(null);
 
             File tempDir= new File(System.getProperty("user.home") + "/Documents/tempFile");
             if (!tempDir.exists()){
                 tempDir= new File("/Documents/tempFile");
+                Junrar.extract(pth,tempDir);
             }
-            final List<ContentDescription> contentFile= Junrar.getContentsDescription(pth);
-            try{
-                for (FileHeader header:headers){
-                    if (!header.isDirectory()){
-                        Junrar.extract(pth,tempDir);
-                }
-            }
-            }
-            catch (IOException e) {
-                throw new RuntimeException(e);
+            Junrar.extract(pth,tempDir);
+            File[] fileExs=tempDir.listFiles();
+            if (fileExs !=null){
+                Arrays.sort(fileExs);
             }
         }
         catch (RarException e) {
@@ -56,6 +49,7 @@ public class cbrReader extends absCore {
     }
     @Override
     public void deleteFile() {
+
 
     }
     @Override
