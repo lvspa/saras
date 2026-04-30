@@ -11,6 +11,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.File;
 import core.absCore;
+
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -23,33 +28,36 @@ public class cbrReader extends absCore {
     @Override
     public void openFile(File pth) {
         try(Archive archive= new Archive(pth)) {
-            FileHeader header;
+            List<FileHeader> headers=archive.getFileHeaders();
+            headers.sort(null);
+
+            File tempDir= new File(System.getProperty("user.home") + "/Documents/tempFile");
+            if (!tempDir.exists()){
+                tempDir= new File("/Documents/tempFile");
+            }
             final List<ContentDescription> contentFile= Junrar.getContentsDescription(pth);
-            while ((header=archive.nextFileHeader())!=null){
-                if (!header.isDirectory()){
-                    InputStream is=archive.getInputStream(header);
-                    BufferedImage img=null;
-                    is.close();
-                    try{
-                        img=ImageIO.read(is);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
+            try{
+                for (FileHeader header:headers){
+                    if (!header.isDirectory()){
+                        Junrar.extract(pth,tempDir);
                 }
             }
-        } catch (RarException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
+            }
+            catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        catch (RarException e) {
             throw new RuntimeException(e);
         }
-
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
-
     @Override
     public void deleteFile() {
 
     }
-
     @Override
     public void close() throws Exception {
 
